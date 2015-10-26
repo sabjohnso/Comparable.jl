@@ -3,9 +3,9 @@
 ### Derived Binary Comparison Operators
 
 [![Build Status](http://travis-ci.org/sabjohnso/Comparable.jl.svg?branch=master)](https://travis-ci.org/sabjohnso/Comparable.jl)
-[![codecov.io](http://codecov.io/github/sabjohnso/Comparable.jl.svg?branch=master)](http://codecov.io/github/sabjohnso/Comparable.jl?branch=master)
+[![codecov.io](http://codecov.io/github/sabjohnso/Comparable.jl/coverage.svg?branch=master)](http://codecov.io/github/sabjohnso/Comparable.jl?branch=master)
 
-`Comparable` is a [Julia](http://julialang.org) package to facilitate the generation of types with binary comparison operator by using a user defined `<` operator to derive the remaining binary comparison operators: `<=`, `>`, `>=`, `==` and  `!=`.
+`Comparable.jl` is a [Julia](http://julialang.org) package to facilitate the generation of types with binary comparison operator by using a user defined `<` operator to derive the remaining binary comparison operators: `<=`, `>`, `>=`, `==` and  `!=`.
 
 Dual licensing (GPLv3, alternate commercial) - See LICENSE.md
 
