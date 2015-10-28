@@ -1,4 +1,4 @@
-### file: Scalar/test/runtests.jl
+### file: Comparable/src/Comparable.jl
 
 ## Copyright (c) 2015 Samuel B. Johnson
 
@@ -17,21 +17,72 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ### Code:
+
 "
 module Comparable
 -----------------
-A module exporting an abstract type, AbstractComparable and a number
-of methods overloaded for subtypes of that type to facilitate the
-creation of types with binary comparison operators.
+A module to facilitate the construction of type
+that have binary comparison operators.
 "
 module Comparable
 
 import Base.>, Base.>=, Base.<=, Base.==, Base.!=
 
-export AbstractComparable, >, >=, <=, ==, !=
+export AbstractComparable, >, >=, <=, ==, !=, eq, neq
+export make_comparable, make_comparable_abstract
 
+"
+@make_comparable
+----------------
+A macro to derive the remaining binary comparison operators from 
+the `<` operator defined for the specified type.
+"
+macro make_comparable( T )
+    esc( quote
+         >=( a::$T, b::$T ) = !( a < b )
+         >( a::$T, b::$T ) = b < a
+         <=( a::$T, b::$T ) = !( b < a )
+         ==( a::$T, b::$T ) = !(( a < b ) || ( b < a ))
+         
+         >=( a::$T, b ) = !( a < b )
+         >( a::$T, b ) = b < a
+         <=( a::$T, b ) = !( b < a )
+         ==( a::$T, b ) = !(( a < b ) || ( b < a ))
+         
+         >=( a, b::$T ) = !( a < b )
+         >( a, b::$T ) = b < a
+        <=( a, b::$T ) = !( b < a )
+        ==( a, b::$T ) = !(( a < b ) || ( b < a ))
+    end )
+end
 
+"
+@make_comparable_abstract
+-------------------------
+A macro to derive the remaining comparison operators from
+the `<` operator defined for an abstract type.
+"
+macro make_comparable_abstract( C::Symbol )
 
+    T = C != :T ? :T : Symbol( string( "T", randstring( 2 )))
+    esc( quote
+
+         >=( a::$C, b::$C ) = !( a < b )
+         >( a::$C, b::$C ) = b < a
+         <=( a::$C, b::$C ) = !( b < a )
+         ==( a::$C, b::$C ) = !(( a < b ) || ( b < a ))
+         
+         >=( a::$C, b ) = !( a < b )
+         >( a::$C, b ) = b < a
+         <=( a::$C, b ) = !( b < a )
+         =={ $T <: $C }( a::$T, b ) = !(( a < b ) || ( b < a ))
+         
+         >=( a, b::$C ) = !( a < b )
+        >( a, b::$C ) = b < a
+        <=( a, b::$C ) = !( b < a )
+        =={ $T <: $C }( a, b::$T ) = !(( a < b ) || ( b < a ))
+    end)
+end
 
 "
 AbstractComparable
@@ -42,12 +93,10 @@ by deriving the binary comparison operators from `<`.
 abstract AbstractComparable
 
 #
-# ... Derived binary comparison operators
+# ... Derive the binary comparison operators
 #
->{ T <: AbstractComparable }( a::T, b::T ) = b < a
->={ T <: AbstractComparable }( a::T, b::T ) = !( a < b )
-<={ T <: AbstractComparable }( a::T, b::T ) = !( b < a )
-=={ T <: AbstractComparable }( a::T, b::T ) = !( a < b || b < a )
-!={ T <: AbstractComparable }( a::T, b::T ) = a < b || b < a
+
+@make_comparable_abstract AbstractComparable
+
 
 end # module

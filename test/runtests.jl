@@ -1,4 +1,4 @@
-### file: Scalar/test/runtests.jl
+### file: Comparable/test/runtests.jl
 
 ## Copyright (c) 2015 Samuel B. Johnson
 
@@ -25,7 +25,10 @@ import Base.<
 immutable SimpleWrapper{T} <: AbstractComparable
     value::T
 end
-<{T}( a::SimpleWrapper{T}, b::SimpleWrapper{T} ) = a.value < b.value
+
+<{T1,T2}( a::SimpleWrapper{T1}, b::SimpleWrapper{T2} ) = a.value < b.value
+<{T}( a::SimpleWrapper{T}, b ) = a.value < b
+<{T}( a, b::SimpleWrapper{T} ) = a < b.value
 
 facts( "Comparable" ) do
 
@@ -54,6 +57,39 @@ facts( "Comparable" ) do
     context( "with a == b" ) do
         a = SimpleWrapper( 1 )
         b = SimpleWrapper( 1 )
+        @fact a < b --> false
+        @fact a <= b --> true
+        @fact a == b --> true
+        @fact a != b --> false
+        @fact a >= b --> true
+        @fact a > b --> false
+    end
+
+    context( "with a < b and only a is wrapped" ) do
+        a = SimpleWrapper( 1 )
+        b = 2 
+        @fact a < b --> true
+        @fact a <= b --> true
+        @fact a == b --> false
+        @fact a != b --> true
+        @fact a >= b --> false
+        @fact a > b --> false    
+    end
+
+    context( "with a > b and only a is wrapped" ) do
+        a = SimpleWrapper( 2 )
+        b = 1
+        @fact a < b --> false
+        @fact a <= b --> false
+        @fact a == b --> false
+        @fact a != b --> true
+        @fact a >= b --> true
+        @fact a > b --> true
+    end
+
+    context( "with a == b and only a is wrapped" ) do
+        a = SimpleWrapper( 1 )
+        b = 1
         @fact a < b --> false
         @fact a <= b --> true
         @fact a == b --> true
